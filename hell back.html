@@ -17,7 +17,8 @@
 	</div>
 	</div>
     <script type="text/babel">
-	/* Creates the main jsx class "App" */
+/* ########## Creates the main jsx class "App" ######### */
+
 	var App = React.createClass	({
 	
 		/* Creates a functin which will create a data structure and display it 
@@ -74,64 +75,60 @@
 			this.setState ({participantList: this.state.participantList.concat(newParticipant)});
 						
 														}
-							}); /* end of jsx class "App" */
-							
-	
-	/* Creates a jsx class "ParticipantsForm" to have a 3 field form 
-		to add data to state which displyes on table */
-	var ParticipantsForm  = React.createClass	({
-	
-			
-				render: function (){
-				return(
-				<div>
-				<h1>{this.state.title}</h1>		
-					<form onSubmit={this.submit} className="form-inline">
-							
-							<input type="text" className="form-control mb-2 mr-sm-2 mb-sm-0" ref="name" placeholder="Name" />
+							}); /* ####### end of jsx class "App" ###### */
 
 							
-							<div className="input-group mb-2 mr-sm-2 mb-sm-0">
-							<div className="input-group-addon">@</div>
+/* ############# 	Creates a jsx class "ParticipantsForm" to have a 3 field form 
+					to add data to state which displyes on table 
+################ */
+		
+	var ParticipantsForm  = React.createClass	({
+	
+		/* this 'rander' function will generate an inline bootstrap form 
+			containing 3 input fields to add data to state */
+		render: function()	{
+			return	(
+			<div>
+				<form onSubmit={this.submit} className="form-inline">
+					<input type="text" className="form-control mb-2 mr-sm-2 mb-sm-0" ref="name" placeholder="Name" />
+					<div className="input-group mb-2 mr-sm-2 mb-sm-0">
+						<div className="input-group-addon">@</div>
 							<input type="email" className="form-control" placeholder="Email Address" ref="email" />
-							</div>
-							
-							
-							<div className="input-group mb-2 mr-sm-2 mb-sm-0">
-							<div className="input-group-addon">Call</div>
+					</div>
+					<div className="input-group mb-2 mr-sm-2 mb-sm-0">
+						<div className="input-group-addon">Call</div>
 							<input type="phone" className="form-control" ref="phone" placeholder="Phone Number"/>
-							</div>
-							
-							<div className="input-group mb-2 mr-sm-2 mb-sm-0">
-							<button type="submit" className="btn btn-primary">Add</button>
-							</div>
-					</form>
-					
-				</div>
-				)
-			},
-			updateName: function () {
-			console.log('changing name...');
-			},
-			submit: function (e) {
+					</div>
+					<div className="input-group mb-2 mr-sm-2 mb-sm-0">
+						<button type="submit" className="btn btn-primary">Add</button>
+					</div>
+				</form>
+			</div>
+					)
+							},
+		/* this 'submit' is called when the form is submited to add data, 
+			this function validates and processes the data   */					
+		submit: function(e)	{
 			e.preventDefault();
 			var name = this.refs.name.value.trim();
 			var email = this.refs.email.value.trim();
 			var phone = this.refs.phone.value.trim();
 			
-			if (!name || !email || !phone){
-			alert ('Some value fields are empty !');
-			return;
-			}
+			if (!name || !email || !phone)	{
+				alert ('Some value fields are empty !');
+				return;
+											}
 			
-			this.props.submitAdd (name,email,phone);
+			this.props.submitAdd (name,email,phone); /* cals 'submitAdd' funtion and passes the parameters */
 			
 			this.refs.name.value ='';
 			this.refs.email.value ='';
 			this.refs.phone.value ='';
-			}
-	});
-	
+							}
+												}); /* ####### end of class "ParticipantsForm" ###### */
+	/* ############## 	creates 'ParticipantsTable' class, this class displayes 
+					all data in state thrugh rendering and maping through the participantList's property 
+################## */	
 	var ParticipantsTable  = React.createClass({
 	
 				
@@ -159,6 +156,9 @@
 						)
 					
 					}
+					
+					
+					
 				  </tbody>
 				</table>
 				)

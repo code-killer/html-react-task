@@ -1,8 +1,16 @@
 <!DOCTYPE html>
 <html>
   <head>
+  <style>
+	a.delete {
+	  color:  #7a7b7f;
+	    text-decoration: none;
+    
+	}
+  </style>
     <meta charset="UTF-8" />
     <title>Hello World</title>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" >
     <script src="https://unpkg.com/react@latest/dist/react.js"></script>
     <script src="https://unpkg.com/react-dom@latest/dist/react-dom.js"></script>
@@ -60,7 +68,7 @@
 			<div>
 				{this.state.title}
 				<ParticipantsForm submitAdd={this.handleSubmitAdd}/>
-				<ParticipantsTable participantList = {this.state.participantList} />
+				<ParticipantsTable participantList = {this.state.participantList} deleteParticipant = {this.handleDelete}/>
 			</div>
 					)
 							},
@@ -75,7 +83,20 @@
 									}
 			this.setState ({participantList: this.state.participantList.concat(newParticipant)});
 						
-														}
+														},
+		handleDelete: function (deleteID) {
+		var stateParticipantList = this.state.participantList;
+		var j = stateParticipantList.length;
+		
+		for (var i=0; i<j; i++) {
+			if (stateParticipantList[i].id == deleteID) {
+				stateParticipantList.splice(i,1);
+				}
+			}
+			this.setState({participantList:stateParticipantList});
+		
+		
+		}
 							}); /* ####### end of jsx class "App" ###### */
 							
 	
@@ -144,13 +165,14 @@
 				  </thead>
 				  <tbody>
 				   {
+				   
 						this.props.participantList.map	(
 							participantList => {
-							return 
-							<tr participantList = {participantList} key ={participantList.id}> 
+							return <tr participantList = {participantList} key ={participantList.id}> 
 							<td> {participantList.name}</td>
 							<td> {participantList.email}</td>
 							<td> {participantList.phone}</td>
+							<td> <a onClick={this.delete.bind(this,participantList.id)} className="material-icons delete">delete</a></td>
 							</tr>
 												}
 														)
@@ -159,7 +181,10 @@
 				  </tbody>
 				</table>
 						)
-							}
+							},
+				delete(deleteID) {
+					this.props.deleteParticipant(deleteID);
+				}
 													});
 	
 /* ####### creates react render DOM calls the main class App and prints in HTML div 'root' 
