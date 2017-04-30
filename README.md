@@ -33,7 +33,7 @@ There are enough comments in the code feel free to ask any question at mail2shaf
 The application was created with help of multiple online resources
 
 --- Thank you :)
-    Shafiul
+Shafiul
 
 
 
