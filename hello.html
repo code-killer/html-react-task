@@ -5,6 +5,7 @@
 	a.delete {
 	  color:  #7a7b7f;
 	    text-decoration: none;
+		margin-right:10 px;
     
 	}
   </style>
@@ -30,11 +31,13 @@
 
 	var App = React.createClass	({
 	
-		/* Creates a functin which will create a data structure and display it 
-		for table on first time run code */
+/* Creates initial state which will create a data structure and display it 
+	as initial value to the 'ParticipantsTable' */
+	
 		getInitialState: function ()	{
 			return	{
 			title: "List Of Participants ",
+			editCheck: 0,
 			name: '',
 			participantList:	[
 						{
@@ -61,19 +64,31 @@
 								]
 					}
 										},
-		/* this function called 'render' will render the table and the form 
-			also a title which need to improve later */
+
+										
+/* this function called 'render' will render the table and the form 
+	as well as a title which need to improve later */
+		
 		render: function (){
 			return (
 			<div>
 				{this.state.title}
-				<ParticipantsForm submitAdd={this.handleSubmitAdd}/>
-				<ParticipantsTable participantList = {this.state.participantList} deleteParticipant = {this.handleDelete}/>
+				<ParticipantsForm 
+				{...this.state} 
+				submitAdd={this.handleSubmitAdd} 
+				onChangeData = {this.handleUpdate} 
+				finalizeUpdate= {this.handleFinalizeUpdate}/>
+				
+				<ParticipantsTable 
+				{...this.state}  
+				editParticipant = {this.handleEdit} 
+				deleteParticipant = {this.handleDelete}/>
 			</div>
 					)
 							},
 							
-		/* this function 'handleSubmitAdd' will push the newly submited data from form to the state */	
+/* this function 'handleSubmitAdd' will push the newly submited data from form to the state */	
+
 		handleSubmitAdd: function (name,email,phone)	{
 			var newParticipant = 	{
 				id: this.state.participantList.length+1,
@@ -82,21 +97,61 @@
 				phone: phone
 									}
 			this.setState ({participantList: this.state.participantList.concat(newParticipant)});
-						
 														},
+		
+/* this function 'handleDelete' will remove record from the state */	
+		
 		handleDelete: function (deleteID) {
 		var stateParticipantList = this.state.participantList;
-		var j = stateParticipantList.length;
 		
-		for (var i=0; i<j; i++) {
+		for (var i=0; i<stateParticipantList.length; i++) {
 			if (stateParticipantList[i].id == deleteID) {
 				stateParticipantList.splice(i,1);
 				}
 			}
 			this.setState({participantList:stateParticipantList});
-		
-		
+
+											},
+											
+/* there are three funtion responsible for updating existing record 
+'handleEdit' receives the existing data of record  and sets them to the state 
+			so that they can be displyed for editing 
+'handleUpdate' sets the updated value to state for further processing
+'handleFinalizeUpdate' finally pushes updated data to state, 
+		this update happens by first removing the recode from state 
+		and then seting a new state record containing same id as the deleted one
+ */
+											
+		handleEdit: function (editParticipantData) {
+		this.setState({
+		name: editParticipantData.name,
+		email: editParticipantData.email,
+		phone: editParticipantData.phone,
+		editCheck: editParticipantData.id
+		})
+													
+											},
+											
+		handleUpdate: function (e) {
+		this.setState({
+		name: e.name,
+		email: e.email,
+		phone: e.phone
+		});
+									},
+									
+		handleFinalizeUpdate: function (e){
+		var stateParticipantList = this.state.participantList;
+				
+		for (var i=0; i<stateParticipantList.length; i++) {
+			if (stateParticipantList[i].id == e.id) {
+				stateParticipantList.splice(i,1);
+				}
+			}
+			stateParticipantList.push(e);
+			this.setState({participantList:stateParticipantList});
 		}
+											
 							}); /* ####### end of jsx class "App" ###### */
 							
 	
@@ -112,14 +167,14 @@
 			return	(
 			<div>
 				<form onSubmit={this.submit} className="form-inline">
-					<input type="text" className="form-control mb-2 mr-sm-2 mb-sm-0" ref="name" placeholder="Name" />
+					<input type="text" className="form-control mb-2 mr-sm-2 mb-sm-0" ref="name" placeholder="Name" value ={this.props.name} onChange = {this.onChangeHandler} />
 					<div className="input-group mb-2 mr-sm-2 mb-sm-0">
 						<div className="input-group-addon">@</div>
-							<input type="email" className="form-control" placeholder="Email Address" ref="email" />
+							<input type="email" className="form-control" placeholder="Email Address" ref="email"  value ={this.props.email} onChange = {this.onChangeHandler} />
 					</div>
 					<div className="input-group mb-2 mr-sm-2 mb-sm-0">
 						<div className="input-group-addon">Call</div>
-							<input type="phone" className="form-control" ref="phone" placeholder="Phone Number"/>
+							<input type="phone" className="form-control" ref="phone" placeholder="Phone Number"  value ={this.props.phone} onChange = {this.onChangeHandler} />
 					</div>
 					<div className="input-group mb-2 mr-sm-2 mb-sm-0">
 						<button type="submit" className="btn btn-primary">Add</button>
@@ -128,27 +183,47 @@
 			</div>
 					)
 							},
-		/* this 'submit' is called when the form is submited to add data, 
-			this function validates and processes the data   */					
+/* this 'submit' is called when the form is submited to add data or on updating data , 
+		this function validates and processes the data   */		
+		
 		submit: function(e)	{
 			e.preventDefault();
 			var name = this.refs.name.value.trim();
 			var email = this.refs.email.value.trim();
 			var phone = this.refs.phone.value.trim();
 			
+/* empty field validation  */
 			if (!name || !email || !phone)	{
 				alert ('Some value fields are empty !');
 				return;
-											}
-			
+/* checks if the submit request for new record or for updated record 
+here 'editCheck' is a parameter to check if an edit reqest were made
+*/											}
+			if (this.props.editCheck){
+				var updatedParticipantList = {
+				id: this.props.editCheck,
+				name: name,
+				email: email,
+				phone: phone
+				}
+				this.props.finalizeUpdate(updatedParticipantList);
+			}
+			else {
 			this.props.submitAdd (name,email,phone); /* cals 'submitAdd' funtion and passes the parameters */
-			
+				}
+/* after submitting sets the form fields empty */
 			this.refs.name.value ='';
 			this.refs.email.value ='';
 			this.refs.phone.value ='';
-							}
+			
+/* little on change handler to pass the value up to the render in 'App' class */							},
+		onChangeHandler: function (e) {
+		this.props.onChangeData(e.target.value);
+		}
 												}); /* ####### end of class "ParticipantsForm" ###### */
-	
+
+
+												
 /* ############## 	creates 'ParticipantsTable' class, this class displayes 
 					all data in state thrugh rendering and maping through the participantList's property 
 ################## */			
@@ -164,6 +239,7 @@
 					</tr>
 				  </thead>
 				  <tbody>
+				  
 				   {
 				   
 						this.props.participantList.map	(
@@ -172,20 +248,34 @@
 							<td> {participantList.name}</td>
 							<td> {participantList.email}</td>
 							<td> {participantList.phone}</td>
+							
+							<td><a onClick={this.edit.bind(this,participantList)} className="material-icons delete">edit</a> </td>
 							<td> <a onClick={this.delete.bind(this,participantList.id)} className="material-icons delete">delete</a></td>
 							</tr>
 												}
 														)
 					
 					}
+					
 				  </tbody>
 				</table>
 						)
 							},
-				delete(deleteID) {
-					this.props.deleteParticipant(deleteID);
-				}
-													});
+							
+/* delete and edit function, first called from the anchor tag from the table,
+	they are here to pass the appropiate value to render in 'App' class
+*/
+		delete: function(deleteID) 	{
+		this.props.deleteParticipant(deleteID);
+									},
+				
+		edit: function(editParticipantData) {				
+		this.props.editParticipant(editParticipantData);
+											}					
+				
+													});  /* ####### end of class "ParticipantsTable" ###### */
+													
+													
 	
 /* ####### creates react render DOM calls the main class App and prints in HTML div 'root' 
 ########## */
