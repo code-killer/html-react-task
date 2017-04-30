@@ -26,7 +26,15 @@ Milestone  |Comment
 8  | Achived 
 9  | Not Achived
 
-The application can be downloaded using 'git clone <url> or direct download from the github 
+The application can be downloaded using 'git clone' or direct download from the github.com
+The application can be run from any desktop browser
+There are enough comments in the code feel free to ask any question at mail2shafiul@gmail.com
+
+The application was created with help of multiple online resources
+
+--- Thank you :)
+    Shafiul
+
 
 
 
